@@ -4,7 +4,6 @@ import (
 	interfaces "expensetracker/interfaces"
 	"expensetracker/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,16 +25,9 @@ func (tc TransactionController) AddTransaction(c *gin.Context) {
 
 // Save Transaction
 func (tc TransactionController) SaveTransaction(c *gin.Context) {
-	intValue, err := strconv.ParseInt(c.PostForm("amount"), 10, 64)
-	if err != nil {
+	var transaction models.Transaction
+	if err := c.ShouldBind(&transaction); err != nil {
 		return
-	}
-
-	transaction := models.Transaction{
-		Reference:       c.PostForm("ref"),
-		Description:     c.PostForm("desc"),
-		TransactionType: c.PostForm("trantype"),
-		Amount:          float64(intValue),
 	}
 
 	params := tc.tm.Save(transaction)
@@ -52,23 +44,19 @@ func (tc TransactionController) GetTransactions(c *gin.Context) {
 
 // Edit Transaction
 func (tc TransactionController) EditTransaction(c *gin.Context) {
-
-	params := tc.tm.Edit(c.Query("id"))
-	c.JSON(http.StatusOK, params)
+	var params models.IdBinding
+	if err := c.ShouldBind(&params); err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, params.Id)
 	//c.HTML(http.StatusOK, "viewtransaction.tmpl", params)
 }
 
 // Update Transaction
 func (tc TransactionController) UpdateTransaction(c *gin.Context) {
-	intValue, err := strconv.ParseInt(c.PostForm("amount"), 10, 64)
-	if err != nil {
+	var transaction models.Transaction
+	if err := c.ShouldBind(&transaction); err != nil {
 		return
-	}
-	transaction := models.Transaction{
-		Reference:       c.PostForm("ref"),
-		Description:     c.PostForm("desc"),
-		TransactionType: c.PostForm("trantype"),
-		Amount:          float64(intValue),
 	}
 
 	params := tc.tm.Update(c.Query("id"), transaction)
@@ -78,7 +66,10 @@ func (tc TransactionController) UpdateTransaction(c *gin.Context) {
 
 // Delete Transaction
 func (tc TransactionController) DeleteTransaction(c *gin.Context) {
-	params := tc.tm.Delete(c.Query("id"))
-	c.JSON(http.StatusOK, params)
+	var params models.IdBinding
+	if err := c.ShouldBind(&params); err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, params.Id)
 	//c.HTML(http.StatusOK, "viewtransaction.tmpl", params)
 }

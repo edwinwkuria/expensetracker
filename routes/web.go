@@ -12,9 +12,9 @@ func ConfigureWebRoutes(r *gin.Engine) {
 	ts := services.NewTransactionManager()
 	tc := controllers.NewTransactionController(ts)
 	r.GET("/", tc.GetTransactions)
-	r.GET("/edit", tc.EditTransaction)
+	r.GET("/:id", tc.EditTransaction)
 	r.GET("/add", tc.AddTransaction)
-	r.POST("/save", tc.SaveTransaction)
-	r.PATCH("/update", tc.UpdateTransaction)
-	r.DELETE("/delete", tc.DeleteTransaction)
+	r.POST("/:id", tc.SaveTransaction)
+	r.PATCH("/:id", tc.UpdateTransaction)
+	r.DELETE("/:id", tc.DeleteTransaction)
 }
